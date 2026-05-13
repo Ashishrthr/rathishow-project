@@ -32,8 +32,12 @@ SECRET_KEY = 'django-insecure-_$*o9*4r#59#m7j96nlorc8wteu($+(_isc58xz^nymkvv(zg4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['https://rathishow-project.onrender.com','5018e79119c2.ngrok-free.app','127.0.0.1']
+ALLOWED_HOSTS = ['.onrender.com','5018e79119c2.ngrok-free.app','127.0.0.1','.vercel.app',]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.onrender.com',
+    'https://*.vercel.app',
+]
 
 # Application definition
 
