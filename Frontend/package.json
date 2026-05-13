@@ -2,6 +2,9 @@
   "name": "RathiShow",
   "version": "0.0.0",
   "private": true,
+  "engines": {
+  "node": "20.x"
+},
   "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
   "homepage": "https://github.com/Ashishrthr/RathiShow#readme",
   "bugs": {
