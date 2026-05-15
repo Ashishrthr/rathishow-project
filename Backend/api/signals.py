@@ -67,7 +67,7 @@ def schedule_delete_show(sender, instance, created, **kwargs):
             emails.attach_alternative(html_content, "text/html")
             emails.attach(img1)
             emails.attach(img2)
-            emails.send(fail_silently=True)
+            emails.send()
             print("emaiilsent successfully  to  ",user_email)
     else:
         print(instance.id, "updated show's seats")
