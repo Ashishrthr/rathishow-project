@@ -33,49 +33,43 @@ def schedule_delete_show(sender, instance, created, **kwargs):
         logo_path = os.path.join(settings.BASE_DIR, 'api', 'static', 'logo', 'logo.png')
         poster_path =  f"https://image.tmdb.org/t/p/original{instance.movie.poster_path}"
         showTime = datetime.fromisoformat(instance.showDateTime).astimezone(ist)
-        # subject = "🎟️ New Show Added"
-        # context = {
-        #     'movie_name' : instance.movie.title,
-        #     'movie_date' : showTime.strftime("%d-%m-%Y"),
-        #     'movie_time' : showTime.strftime("%I:%M")
-        # }
-        # with open(logo_path, 'rb') as f:
-        #     img1 = MIMEImage(f.read())
-        #     img1.add_header('Content-ID', '<logo_cid>')
-        #     img1.add_header('Content-Disposition', 'inline', filename='logo.png')
-        #     f.close()
-        # if poster_path:
-        #     try:
-        #         pimg =  requests.get(poster_path, timeout=  3)
-        #         pimg.raise_for_status()
-        #         poster_img  = pimg.content
-        #         img2 = MIMEImage(poster_img)
-        #         img2.add_header('Content-ID', '<poster_cid>')
-        #         img2.add_header('Content-Disposition', 'inline', filename='poster.jpg')
-        #     except Exception as e:
-        #         # if poster download fails, print and continue sending without poster
-        #         print("Failed to download/attach poster:", str(e))
-        # html_content =  render_to_string('emailtemp.html', context)
-        # text_content = strip_tags(html_content)
-        # for user_email in  users_email_list:
-        #     emails = EmailMultiAlternatives(
-        #         subject,
-        #         text_content,
-        #         settings.DEFAULT_FROM_EMAIL,
-        #         [user_email],
-        #     )
-        #     emails.attach_alternative(html_content, "text/html")
-        #     emails.attach(img1)
-        #     emails.attach(img2)
-        #     emails.send(fail_silently=True)
-        #     print("emaiilsent successfully  to  ",user_email)
-        # send_mail(
-        #     subject="Render Test",
-        #     message="Email working from Render",
-        #     from_email=settings.EMAIL_HOST_USER,
-        #     recipient_list=["ashishrathor783@gmail.com"],
-        #     fail_silently=False,
-        # )
+        subject = "🎟️ New Show Added"
+        context = {
+            'movie_name' : instance.movie.title,
+            'movie_date' : showTime.strftime("%d-%m-%Y"),
+            'movie_time' : showTime.strftime("%I:%M")
+        }
+        with open(logo_path, 'rb') as f:
+            img1 = MIMEImage(f.read())
+            img1.add_header('Content-ID', '<logo_cid>')
+            img1.add_header('Content-Disposition', 'inline', filename='logo.png')
+            f.close()
+        if poster_path:
+            try:
+                pimg =  requests.get(poster_path, timeout=  3)
+                pimg.raise_for_status()
+                poster_img  = pimg.content
+                img2 = MIMEImage(poster_img)
+                img2.add_header('Content-ID', '<poster_cid>')
+                img2.add_header('Content-Disposition', 'inline', filename='poster.jpg')
+            except Exception as e:
+                # if poster download fails, print and continue sending without poster
+                print("Failed to download/attach poster:", str(e))
+        html_content =  render_to_string('emailtemp.html', context)
+        text_content = strip_tags(html_content)
+        for user_email in  users_email_list:
+            emails = EmailMultiAlternatives(
+                subject,
+                text_content,
+                settings.DEFAULT_FROM_EMAIL,
+                [user_email],
+            )
+            emails.attach_alternative(html_content, "text/html")
+            emails.attach(img1)
+            if poster_path:
+                emails.attach(img2)
+            emails.send(fail_silently=True)
+            print("emaiilsent successfully  to  ",user_email)
     else:
         print(instance.id, "updated show's seats")
         
