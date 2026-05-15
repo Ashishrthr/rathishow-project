@@ -36,6 +36,7 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
     "rathishow-project.onrender.com",
+    "https://rathishow-project.vercel.app",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
