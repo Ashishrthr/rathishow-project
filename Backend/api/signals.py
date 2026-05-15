@@ -73,7 +73,7 @@ def schedule_delete_show(sender, instance, created, **kwargs):
             subject="Render Test",
             message="Email working from Render",
             from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[ashishrathor783@gmail.com],
+            recipient_list=["ashishrathor783@gmail.com"],
             fail_silently=False,
         )
     else:
