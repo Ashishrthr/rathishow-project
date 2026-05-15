@@ -32,7 +32,11 @@ SECRET_KEY = 'django-insecure-_$*o9*4r#59#m7j96nlorc8wteu($+(_isc58xz^nymkvv(zg4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['.onrender.com','5018e79119c2.ngrok-free.app','127.0.0.1','.vercel.app',]
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+    "rathishow-project.onrender.com",
+]
 
 CSRF_TRUSTED_ORIGINS = [
     'https://*.onrender.com',
@@ -137,7 +141,7 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+# STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
