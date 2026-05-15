@@ -39,7 +39,7 @@ def schedule_delete_show(sender, instance, created, **kwargs):
             'movie_date' : showTime.strftime("%d-%m-%Y"),
             'movie_time' : showTime.strftime("%I:%M"),
             'movie_image' : f"https://image.tmdb.org/t/p/w500{instance.movie.poster_path}",
-            'logo_url' : "https://rathishow-project.vercel.app/logo.png"
+            'logo_url' : "https://rathishow-project.vercel.app/assets/logo-DGRX_A7C.svg"
         }
         # with open(logo_path, 'rb') as f:
         #     img1 = MIMEImage(f.read())
