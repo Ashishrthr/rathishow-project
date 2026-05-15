@@ -69,13 +69,13 @@ def schedule_delete_show(sender, instance, created, **kwargs):
         #     emails.attach(img2)
         #     emails.send(fail_silently=True)
         #     print("emaiilsent successfully  to  ",user_email)
-        send_mail(
-            subject="Render Test",
-            message="Email working from Render",
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=["ashishrathor783@gmail.com"],
-            fail_silently=False,
-        )
+        # send_mail(
+        #     subject="Render Test",
+        #     message="Email working from Render",
+        #     from_email=settings.EMAIL_HOST_USER,
+        #     recipient_list=["ashishrathor783@gmail.com"],
+        #     fail_silently=False,
+        # )
     else:
         print(instance.id, "updated show's seats")
         
