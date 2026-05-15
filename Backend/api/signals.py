@@ -29,18 +29,16 @@ def schedule_delete_show(sender, instance, created, **kwargs):
         # Email to  be  sent  After Adding Show
         
         ist = pytz.timezone("Asia/Kolkata")
-        users_email_list = list(Users.objects.values_list("email",flat=True))
+        # users_email_list = list(Users.objects.values_list("email",flat=True))
         # logo_path = os.path.join(settings.BASE_DIR, 'api', 'static', 'logo', 'logo.png')
         # poster_path =  f"https://image.tmdb.org/t/p/original{instance.movie.poster_path}"
-        showTime = datetime.fromisoformat(instance.showDateTime).astimezone(ist)
+        # showTime = datetime.fromisoformat(instance.showDateTime).astimezone(ist)
         subject = "🎟️ New Show Added"
-        context = {
-            'movie_name' : instance.movie.title,
-            'movie_date' : showTime.strftime("%d-%m-%Y"),
-            'movie_time' : showTime.strftime("%I:%M"),
-            'movie_image' : f"https://image.tmdb.org/t/p/w500{instance.movie.poster_path}",
-            'logo_url' : "https://rathishow-project.vercel.app/assets/logo-DGRX_A7C.svg"
-        }
+        # context = {
+        #     'movie_name' : instance.movie.title,
+        #     'movie_date' : showTime.strftime("%d-%m-%Y"),
+        #     'movie_time' : showTime.strftime("%I:%M")
+        # }
         # with open(logo_path, 'rb') as f:
         #     img1 = MIMEImage(f.read())
         #     img1.add_header('Content-ID', '<logo_cid>')
@@ -59,27 +57,36 @@ def schedule_delete_show(sender, instance, created, **kwargs):
         #         print("Failed to download/attach poster:", str(e))
         html_content =  render_to_string('emailtemp.html', context)
         text_content = strip_tags(html_content)
-        for user_email in  users_email_list:
-            try:
-                emails = EmailMultiAlternatives(
-                    subject,
-                    text_content,
-                    settings.DEFAULT_FROM_EMAIL,
-                    [user_email],
-                )
-                emails.attach_alternative(html_content, "text/html")
-                # emails.attach(img1)
-                # if poster_path:
-                #     emails.attach(img2)
-                emails.send(fail_silently=False)
-                print("emaiilsent successfully  to  ",user_email)
-            except Exception as e:
+        # for user_email in  users_email_list:
+        #     emails = EmailMultiAlternatives(
+        #         subject,
+        #         text_content,
+        #         settings.DEFAULT_FROM_EMAIL,
+        #         [user_email],
+        #     )
+        #     emails.attach_alternative(html_content, "text/html")
+        #     emails.attach(img1)
+        #     if poster_path:
+        #         emails.attach(img2)
+        #     emails.send(fail_silently=True)
+        #     print("emaiilsent successfully  to  ",user_email)
+        test_email = "ashishrathor783@gmail.com"
 
-                print(
-                    "email failed for",
-                    user_email,
-                    str(e)
-                )
+        emails = EmailMultiAlternatives(
+            subject,
+            text_content,
+            settings.DEFAULT_FROM_EMAIL,
+            [test_email],
+        )
+
+        emails.attach_alternative(
+            html_content,
+            "text/html"
+        )
+
+        emails.send(fail_silently=False)
+
+        print("single email sent")
     else:
         print(instance.id, "updated show's seats")
         
