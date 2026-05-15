@@ -46,7 +46,7 @@ def schedule_delete_show(sender, instance, created, **kwargs):
             f.close()
         if poster_path:
             try:
-                pimg =  requests.get(poster_path, timeout=  10)
+                pimg =  requests.get(poster_path, timeout=  3)
                 pimg.raise_for_status()
                 poster_img  = pimg.content
                 img2 = MIMEImage(poster_img)
@@ -57,18 +57,18 @@ def schedule_delete_show(sender, instance, created, **kwargs):
                 print("Failed to download/attach poster:", str(e))
         html_content =  render_to_string('emailtemp.html', context)
         text_content = strip_tags(html_content)
-        # for user_email in  users_email_list:
-        #     emails = EmailMultiAlternatives(
-        #         subject,
-        #         text_content,
-        #         settings.DEFAULT_FROM_EMAIL,
-        #         [user_email],
-        #     )
-            # emails.attach_alternative(html_content, "text/html")
-            # emails.attach(img1)
-            # emails.attach(img2)
-            # emails.send()
-            # print("emaiilsent successfully  to  ",user_email)
+        for user_email in  users_email_list:
+            emails = EmailMultiAlternatives(
+                subject,
+                text_content,
+                settings.DEFAULT_FROM_EMAIL,
+                [user_email],
+            )
+            emails.attach_alternative(html_content, "text/html")
+            emails.attach(img1)
+            emails.attach(img2)
+            emails.send(fail_silently=True)
+            print("emaiilsent successfully  to  ",user_email)
     else:
         print(instance.id, "updated show's seats")
         
