@@ -32,13 +32,13 @@ def schedule_delete_show(sender, instance, created, **kwargs):
         # users_email_list = list(Users.objects.values_list("email",flat=True))
         # logo_path = os.path.join(settings.BASE_DIR, 'api', 'static', 'logo', 'logo.png')
         # poster_path =  f"https://image.tmdb.org/t/p/original{instance.movie.poster_path}"
-        # showTime = datetime.fromisoformat(instance.showDateTime).astimezone(ist)
+        showTime = datetime.fromisoformat(instance.showDateTime).astimezone(ist)
         subject = "🎟️ New Show Added"
-        # context = {
-        #     'movie_name' : instance.movie.title,
-        #     'movie_date' : showTime.strftime("%d-%m-%Y"),
-        #     'movie_time' : showTime.strftime("%I:%M")
-        # }
+        context = {
+            'movie_name' : instance.movie.title,
+            'movie_date' : showTime.strftime("%d-%m-%Y"),
+            'movie_time' : showTime.strftime("%I:%M")
+        }
         # with open(logo_path, 'rb') as f:
         #     img1 = MIMEImage(f.read())
         #     img1.add_header('Content-ID', '<logo_cid>')
