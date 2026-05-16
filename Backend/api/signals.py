@@ -37,24 +37,26 @@ def schedule_delete_show(sender, instance, created, **kwargs):
         context = {
             'movie_name' : instance.movie.title,
             'movie_date' : showTime.strftime("%d-%m-%Y"),
-            'movie_time' : showTime.strftime("%I:%M")
+            'movie_time' : showTime.strftime("%I:%M"),
+            'logo'       : logo_path,
+            'poster'     : poster_path
         }
-        with open(logo_path, 'rb') as f:
-            img1 = MIMEImage(f.read())
-            img1.add_header('Content-ID', '<logo_cid>')
-            img1.add_header('Content-Disposition', 'inline', filename='logo.png')
-            f.close()
-        if poster_path:
-            try:
-                pimg =  requests.get(poster_path, timeout=  3)
-                pimg.raise_for_status()
-                poster_img  = pimg.content
-                img2 = MIMEImage(poster_img)
-                img2.add_header('Content-ID', '<poster_cid>')
-                img2.add_header('Content-Disposition', 'inline', filename='poster.jpg')
-            except Exception as e:
-                # if poster download fails, print and continue sending without poster
-                print("Failed to download/attach poster:", str(e))
+        # with open(logo_path, 'rb') as f:
+        #     img1 = MIMEImage(f.read())
+        #     img1.add_header('Content-ID', '<logo_cid>')
+        #     img1.add_header('Content-Disposition', 'inline', filename='logo.png')
+        #     f.close()
+        # if poster_path:
+        #     try:
+        #         pimg =  requests.get(poster_path, timeout=  3)
+        #         pimg.raise_for_status()
+        #         poster_img  = pimg.content
+        #         img2 = MIMEImage(poster_img)
+        #         img2.add_header('Content-ID', '<poster_cid>')
+        #         img2.add_header('Content-Disposition', 'inline', filename='poster.jpg')
+        #     except Exception as e:
+        #         # if poster download fails, print and continue sending without poster
+        #         print("Failed to download/attach poster:", str(e))
         html_content =  render_to_string('emailtemp.html', context)
         text_content = strip_tags(html_content)
         
@@ -66,9 +68,9 @@ def schedule_delete_show(sender, instance, created, **kwargs):
             bcc=users_email_list,
         )
         emails.attach_alternative(html_content, "text/html")
-        emails.attach(img1)
-        if poster_path:
-            emails.attach(img2)
+        # emails.attach(img1)
+        # if poster_path:
+        #     emails.attach(img2)
         emails.send(fail_silently=False)
         print("emaiilsent successfully  to  ",users_email_list)
         
