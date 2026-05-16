@@ -12,6 +12,7 @@ from email.mime.image import MIMEImage
 from django.template.loader import render_to_string
 import pytz
 import requests
+import resend
 
 
 @receiver(post_save, sender=Booking)
@@ -23,148 +24,141 @@ def schedule_delete_booking(sender, instance, created, **kwargs):
         print("payment updated")
     
 
+# @receiver(post_save, sender=shows)
+# def schedule_delete_show(sender, instance, created, **kwargs):
+#     if created:
+#         # Email to  be  sent  After Adding Show
+        
+#         ist = pytz.timezone("Asia/Kolkata")
+#         users_email_list = list(Users.objects.values_list("email",flat=True))
+#         logo_path = os.path.join(settings.BASE_DIR, 'api', 'static', 'logo', 'logo.png')
+#         poster_path =  f"https://image.tmdb.org/t/p/w300{instance.movie.poster_path}"
+#         showTime = datetime.fromisoformat(instance.showDateTime).astimezone(ist)
+#         subject = "🎟️ New Show Added"
+#         context = {
+#             'movie_name' : instance.movie.title,
+#             'movie_date' : showTime.strftime("%d-%m-%Y"),
+#             'movie_time' : showTime.strftime("%I:%M")
+#         }
+#         with open(logo_path, 'rb') as f:
+#             img1 = MIMEImage(f.read())
+#             img1.add_header('Content-ID', '<logo_cid>')
+#             img1.add_header('Content-Disposition', 'inline', filename='logo.png')
+#             f.close()
+#         if poster_path:
+#             try:
+#                 pimg =  requests.get(poster_path, timeout=  3)
+#                 pimg.raise_for_status()
+#                 poster_img  = pimg.content
+#                 img2 = MIMEImage(poster_img)
+#                 img2.add_header('Content-ID', '<poster_cid>')
+#                 img2.add_header('Content-Disposition', 'inline', filename='poster.jpg')
+#             except Exception as e:
+#                 # if poster download fails, print and continue sending without poster
+#                 print("Failed to download/attach poster:", str(e))
+#         html_content =  render_to_string('emailtemp.html', context)
+#         text_content = strip_tags(html_content)
+#         for user_email in  users_email_list:
+#             emails = EmailMultiAlternatives(
+#                 subject,
+#                 text_content,
+#                 settings.DEFAULT_FROM_EMAIL,
+#                 [user_email],
+#             )
+#             emails.attach_alternative(html_content, "text/html")
+#             emails.attach(img1)
+#             if poster_path:
+#                 emails.attach(img2)
+#             emails.send(fail_silently=False)
+#             print("emaiilsent successfully  to  ",user_email)
+        
+#     else:
+#         print(instance.id, "updated show's seats")
+        
+resend.api_key = os.getenv("RESEND_API_KEY")
+
+
 @receiver(post_save, sender=shows)
 def schedule_delete_show(sender, instance, created, **kwargs):
 
     if created:
 
-        ist = pytz.timezone("Asia/Kolkata")
+        try:
 
-        showTime = datetime.fromisoformat(
-            str(instance.showDateTime)
-        ).astimezone(ist)
+            ist = pytz.timezone("Asia/Kolkata")
 
-        subject = "🎬 New Show Added"
+            showTime = datetime.fromisoformat(
+                str(instance.showDateTime)
+            ).astimezone(ist)
 
-        context = {
-            "movie_name": instance.movie.title,
-            "movie_date": showTime.strftime("%d-%m-%Y"),
-            "movie_time": showTime.strftime("%I:%M %p"),
-        }
+            movie_name = instance.movie.title
+            movie_date = showTime.strftime("%d-%m-%Y")
+            movie_time = showTime.strftime("%I:%M %p")
 
-        html_content = render_to_string(
-            "emailtemplate.html",
-            context
-        )
+            poster_url = ""
 
-        text_content = strip_tags(html_content)
+            if instance.movie.poster_path:
+                poster_url = f"https://image.tmdb.org/t/p/w300{instance.movie.poster_path}"
 
-        logo_path = os.path.join(
-            settings.BASE_DIR,
-            "api",
-            "static",
-            "logo",
-            "logo.png"
-        )
+            html = f"""
+            <div style="background:#0f0f0f;padding:30px;font-family:Arial;color:white">
 
-        # SMALLER IMAGE SIZE
-        poster_url = (
-            f"https://image.tmdb.org/t/p/w300"
-            f"{instance.movie.poster_path}"
-        )
+                <h1 style="color:#ff4d4d;">
+                    🎬 New Show Added
+                </h1>
 
-        # LOOP WITHOUT LOADING FULL LIST INTO RAM
-        users = Users.objects.values_list(
-            "email",
-            flat=True
-        )
+                <h2>{movie_name}</h2>
 
-        for user_email in users:
+                <p>
+                    <strong>Date:</strong> {movie_date}
+                </p>
 
-            try:
+                <p>
+                    <strong>Time:</strong> {movie_time}
+                </p>
 
-                emails = EmailMultiAlternatives(
-                    subject,
-                    text_content,
-                    settings.DEFAULT_FROM_EMAIL,
-                    [user_email],
-                )
+                <img 
+                    src="{poster_url}" 
+                    width="250"
+                    style="border-radius:10px;margin-top:20px;"
+                >
 
-                emails.attach_alternative(
-                    html_content,
-                    "text/html"
-                )
+            </div>
+            """
 
-                # LOGO
+            users_email_list = Users.objects.values_list(
+                "email",
+                flat=True
+            )
+
+            for user_email in users_email_list:
+
                 try:
 
-                    with open(logo_path, "rb") as f:
+                    resend.Emails.send({
+                        "from": "RathiShow <onboarding@resend.dev>",
+                        "to": user_email,
+                        "subject": "🎬 New Show Added",
+                        "html": html,
+                    })
 
-                        logo = MIMEImage(f.read())
-
-                        logo.add_header(
-                            "Content-ID",
-                            "<logo_cid>"
-                        )
-
-                        logo.add_header(
-                            "Content-Disposition",
-                            "inline",
-                            filename="logo.png"
-                        )
-
-                        emails.attach(logo)
+                    print("Email sent to", user_email)
 
                 except Exception as e:
 
-                    print("logo failed", str(e))
+                    print("Failed for", user_email)
+                    print(str(e))
 
-                # POSTER
-                try:
+        except Exception as e:
 
-                    response = requests.get(
-                        poster_url,
-                        timeout=2,
-                        stream=True
-                    )
-
-                    if response.status_code == 200:
-
-                        poster = MIMEImage(
-                            response.content
-                        )
-
-                        poster.add_header(
-                            "Content-ID",
-                            "<poster_cid>"
-                        )
-
-                        poster.add_header(
-                            "Content-Disposition",
-                            "inline",
-                            filename="poster.jpg"
-                        )
-
-                        emails.attach(poster)
-
-                    response.close()
-
-                except Exception as e:
-
-                    print("poster failed", str(e))
-
-                # SEND
-                emails.send(fail_silently=True)
-
-                print(
-                    "emailsent successfully to",
-                    user_email
-                )
-
-                # IMPORTANT MEMORY CLEANUP
-                del emails
-
-            except Exception as e:
-
-                print(
-                    "email failed",
-                    str(e)
-                )
+            print("Main Email Error")
+            print(str(e))
 
     else:
 
         print(instance.id, "updated show's seats")
-        
+
+
 
 
 @receiver(post_delete, sender=Booking)
