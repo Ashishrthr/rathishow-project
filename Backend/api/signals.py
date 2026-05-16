@@ -62,7 +62,8 @@ def schedule_delete_show(sender, instance, created, **kwargs):
             subject,
             text_content,
             settings.DEFAULT_FROM_EMAIL,
-            users_email_list,
+            [],
+            bcc=users_email_list,
         )
         emails.attach_alternative(html_content, "text/html")
         emails.attach(img1)
